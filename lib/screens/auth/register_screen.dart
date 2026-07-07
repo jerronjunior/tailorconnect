@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
+import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_sizes.dart';
 import '../../core/constants/app_strings.dart';
 import '../../core/utils/validators.dart';
 import '../../models/app_user.dart';
 import '../../providers/auth_providers.dart';
-import '../../widgets/app_text_field.dart';
-import '../../widgets/primary_button.dart';
+import '../../widgets/premium_text_field.dart';
+import '../../widgets/luxury_button.dart';
 
-/// Step 2 of registration. Fields adapt to the role chosen on the
-/// role-selection screen — tailors additionally provide a business name.
-/// On success a verification email is sent and the router redirects to the
-/// correct home based on the created `users/{uid}` document.
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key, required this.role});
 
@@ -63,12 +61,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
-            'Account created. We sent you a verification email — '
-            'please confirm it soon.',
+            'Account created. We sent you a verification email — please confirm it soon.',
           ),
         ),
       );
-      // Router redirect handles navigation once the users doc streams in.
     } else {
       final error = ref.read(authControllerProvider).error;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -83,114 +79,100 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final isLoading = ref.watch(authControllerProvider).isLoading;
 
     return Scaffold(
+      backgroundColor: AppColors.darkBackground,
       appBar: AppBar(
-        leading: const BackButton(),
-        title: Text(_isTailor ? 'Tailor account' : 'Customer account'),
+        leading: const BackButton(color: Colors.white),
+        title: Text(
+          _isTailor ? 'Tailor account' : 'Customer account',
+          style: const TextStyle(color: Colors.white),
+        ),
       ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(AppSizes.lg),
             child: ConstrainedBox(
-              constraints:
-                  const BoxConstraints(maxWidth: AppSizes.maxContentWidth),
+              constraints: const BoxConstraints(maxWidth: AppSizes.maxContentWidth),
               child: Form(
                 key: _formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      _isTailor
-                          ? 'Set up your shop'
-                          : 'Let’s get you measured up',
-                      style: theme.textTheme.headlineMedium,
+                      _isTailor ? 'Set up your shop' : 'Let’s get you measured up',
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        color: AppColors.goldAccent,
+                      ),
                     ).animate().fadeIn().moveY(begin: 12),
                     const SizedBox(height: AppSizes.sm),
                     Text(
                       _isTailor
                           ? 'You can complete your full business profile after signing in.'
                           : 'Create an account to browse tailors and place orders.',
-                      style: theme.textTheme.bodySmall,
+                      style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70),
                     ),
                     const SizedBox(height: AppSizes.lg),
-                    AppTextField(
-                      label: AppStrings.fullName,
+                    PremiumTextField(
+                      hintText: AppStrings.fullName,
                       controller: _nameController,
-                      hint: 'Jane Doe',
-                      prefixIcon: Icons.person_outline,
-                      textInputAction: TextInputAction.next,
-                      validator: (v) =>
-                          Validators.required(v, label: 'Full name'),
-                      autofillHints: const [AutofillHints.name],
+                      prefixIcon: LucideIcons.user,
+                      validator: (v) => Validators.required(v, label: 'Full name'),
                     ),
                     if (_isTailor) ...[
                       const SizedBox(height: AppSizes.md),
-                      AppTextField(
-                        label: AppStrings.businessName,
+                      PremiumTextField(
+                        hintText: AppStrings.businessName,
                         controller: _businessController,
-                        hint: 'Stitch & Co.',
-                        prefixIcon: Icons.storefront_outlined,
-                        textInputAction: TextInputAction.next,
-                        validator: (v) =>
-                            Validators.required(v, label: 'Business name'),
+                        prefixIcon: LucideIcons.store,
+                        validator: (v) => Validators.required(v, label: 'Business name'),
                       ),
                     ],
                     const SizedBox(height: AppSizes.md),
-                    AppTextField(
-                      label: AppStrings.email,
+                    PremiumTextField(
+                      hintText: AppStrings.email,
                       controller: _emailController,
-                      hint: 'you@example.com',
                       keyboardType: TextInputType.emailAddress,
-                      prefixIcon: Icons.mail_outline,
-                      textInputAction: TextInputAction.next,
+                      prefixIcon: LucideIcons.mail,
                       validator: Validators.email,
-                      autofillHints: const [AutofillHints.email],
                     ),
                     const SizedBox(height: AppSizes.md),
-                    AppTextField(
-                      label: AppStrings.phone,
+                    PremiumTextField(
+                      hintText: AppStrings.phone,
                       controller: _phoneController,
-                      hint: '+1 555 000 0000',
                       keyboardType: TextInputType.phone,
-                      prefixIcon: Icons.phone_outlined,
-                      textInputAction: TextInputAction.next,
+                      prefixIcon: LucideIcons.phone,
                       validator: Validators.phone,
-                      autofillHints: const [AutofillHints.telephoneNumber],
                     ),
                     const SizedBox(height: AppSizes.md),
-                    AppTextField(
-                      label: AppStrings.password,
+                    PremiumTextField(
+                      hintText: AppStrings.password,
                       controller: _passwordController,
-                      obscure: true,
-                      prefixIcon: Icons.lock_outline,
-                      textInputAction: TextInputAction.next,
+                      isPassword: true,
+                      prefixIcon: LucideIcons.lock,
                       validator: Validators.password,
-                      autofillHints: const [AutofillHints.newPassword],
                     ),
                     const SizedBox(height: AppSizes.md),
-                    AppTextField(
-                      label: AppStrings.confirmPassword,
+                    PremiumTextField(
+                      hintText: AppStrings.confirmPassword,
                       controller: _confirmController,
-                      obscure: true,
-                      prefixIcon: Icons.lock_outline,
-                      textInputAction: TextInputAction.done,
+                      isPassword: true,
+                      prefixIcon: LucideIcons.checkSquare,
                       validator: (v) => Validators.confirmPassword(
                         v,
                         _passwordController.text,
                       ),
                     ),
                     const SizedBox(height: AppSizes.xl),
-                    PrimaryButton(
-                      label: AppStrings.register,
+                    LuxuryButton(
+                      text: AppStrings.register,
                       isLoading: isLoading,
                       onPressed: _submit,
                     ),
                     const SizedBox(height: AppSizes.md),
                     Text(
-                      'By creating an account you agree to our Terms of '
-                      'Service and Privacy Policy.',
+                      'By creating an account you agree to our Terms of Service and Privacy Policy.',
                       textAlign: TextAlign.center,
-                      style: theme.textTheme.bodySmall,
+                      style: theme.textTheme.bodySmall?.copyWith(color: Colors.white54),
                     ),
                   ],
                 ),

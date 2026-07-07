@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_sizes.dart';
 import '../../providers/auth_providers.dart';
 
-/// Tailor dashboard shell (Module 1).
-///
-/// Stat values are wired to live order/earnings aggregation queries in
-/// Module 5 (Order Management) and Module 8 (Earnings & Analytics).
 class TailorHomeScreen extends ConsumerStatefulWidget {
   const TailorHomeScreen({super.key});
 
@@ -25,21 +22,22 @@ class _TailorHomeScreenState extends ConsumerState<TailorHomeScreen> {
     final user = ref.watch(appUserProvider).valueOrNull;
 
     return Scaffold(
+      backgroundColor: AppColors.darkBackground,
       body: SafeArea(
         child: IndexedStack(
           index: _tab,
           children: [
             _DashboardTab(name: user?.fullName ?? ''),
             const _ComingSoon(
-                icon: Icons.inventory_2_outlined,
+                icon: LucideIcons.package,
                 title: 'Orders',
                 body: 'Incoming and active orders land here in Module 5.'),
             const _ComingSoon(
-                icon: Icons.chat_bubble_outline,
+                icon: LucideIcons.messageSquare,
                 title: 'Messages',
                 body: 'Customer chat arrives in Module 6.'),
             const _ComingSoon(
-                icon: Icons.storefront_outlined,
+                icon: LucideIcons.store,
                 title: 'My shop',
                 body:
                     'Business profile, portfolio, and hours arrive in Module 2.'),
@@ -49,23 +47,24 @@ class _TailorHomeScreenState extends ConsumerState<TailorHomeScreen> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: _tab,
         onDestinationSelected: (i) => setState(() => _tab = i),
-        indicatorColor: AppColors.threadGoldLight.withOpacity(0.35),
+        backgroundColor: AppColors.darkSurface,
+        indicatorColor: AppColors.goldAccent.withAlpha(50),
         destinations: const [
           NavigationDestination(
-              icon: Icon(Icons.dashboard_outlined),
-              selectedIcon: Icon(Icons.dashboard),
+              icon: Icon(LucideIcons.layoutDashboard, color: Colors.white70),
+              selectedIcon: Icon(LucideIcons.layoutDashboard, color: AppColors.goldAccent),
               label: 'Dashboard'),
           NavigationDestination(
-              icon: Icon(Icons.inventory_2_outlined),
-              selectedIcon: Icon(Icons.inventory_2),
+              icon: Icon(LucideIcons.package, color: Colors.white70),
+              selectedIcon: Icon(LucideIcons.package, color: AppColors.goldAccent),
               label: 'Orders'),
           NavigationDestination(
-              icon: Icon(Icons.chat_bubble_outline),
-              selectedIcon: Icon(Icons.chat_bubble),
+              icon: Icon(LucideIcons.messageSquare, color: Colors.white70),
+              selectedIcon: Icon(LucideIcons.messageSquare, color: AppColors.goldAccent),
               label: 'Chat'),
           NavigationDestination(
-              icon: Icon(Icons.storefront_outlined),
-              selectedIcon: Icon(Icons.storefront),
+              icon: Icon(LucideIcons.store, color: Colors.white70),
+              selectedIcon: Icon(LucideIcons.store, color: AppColors.goldAccent),
               label: 'Shop'),
         ],
       ),
@@ -92,15 +91,15 @@ class _DashboardTab extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('Good day, $name',
-                      style: theme.textTheme.headlineMedium),
+                      style: theme.textTheme.headlineMedium?.copyWith(color: Colors.white)),
                   Text('Here’s how your shop is doing',
-                      style: theme.textTheme.bodySmall),
+                      style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70)),
                 ],
               ),
             ),
             IconButton(
               tooltip: 'Log out',
-              icon: const Icon(Icons.logout),
+              icon: const Icon(LucideIcons.logOut, color: Colors.white),
               onPressed: () =>
                   ref.read(authControllerProvider.notifier).signOut(),
             ),
@@ -108,7 +107,6 @@ class _DashboardTab extends ConsumerWidget {
         ).animate().fadeIn().moveY(begin: 8),
         const SizedBox(height: AppSizes.lg),
 
-        // Stat grid — values stream from Firestore aggregations in Module 5/8.
         GridView.count(
           crossAxisCount: 2,
           shrinkWrap: true,
@@ -120,37 +118,37 @@ class _DashboardTab extends ConsumerWidget {
             _StatCard(
                 label: "Today's orders",
                 value: '—',
-                icon: Icons.today_outlined,
+                icon: LucideIcons.calendar,
                 color: AppColors.info),
             _StatCard(
                 label: 'Pending',
                 value: '—',
-                icon: Icons.hourglass_top_outlined,
+                icon: LucideIcons.hourglass,
                 color: AppColors.warning),
             _StatCard(
                 label: 'Completed',
                 value: '—',
-                icon: Icons.check_circle_outline,
+                icon: LucideIcons.checkCircle,
                 color: AppColors.success),
             _StatCard(
                 label: 'Revenue (month)',
                 value: '—',
-                icon: Icons.payments_outlined,
-                color: AppColors.threadGold),
+                icon: LucideIcons.banknote,
+                color: AppColors.goldAccent),
           ],
         ).animate().fadeIn(delay: 100.ms).moveY(begin: 16),
         const SizedBox(height: AppSizes.lg),
 
-        Text('Quick actions', style: theme.textTheme.titleLarge),
+        Text('Quick actions', style: theme.textTheme.titleLarge?.copyWith(color: Colors.white)),
         const SizedBox(height: AppSizes.md),
         const Wrap(
           spacing: AppSizes.md,
           runSpacing: AppSizes.md,
           children: [
-            _QuickAction(icon: Icons.add_a_photo_outlined, label: 'Add portfolio'),
-            _QuickAction(icon: Icons.schedule_outlined, label: 'Set hours'),
-            _QuickAction(icon: Icons.request_quote_outlined, label: 'Send quote'),
-            _QuickAction(icon: Icons.reviews_outlined, label: 'Reviews'),
+            _QuickAction(icon: LucideIcons.camera, label: 'Add portfolio'),
+            _QuickAction(icon: LucideIcons.clock, label: 'Set hours'),
+            _QuickAction(icon: LucideIcons.fileText, label: 'Send quote'),
+            _QuickAction(icon: LucideIcons.star, label: 'Reviews'),
           ],
         ),
       ],
@@ -176,17 +174,24 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSizes.md),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.darkSurfaceHighlight,
         borderRadius: BorderRadius.circular(AppSizes.radiusCard),
-        border: Border.all(color: AppColors.stitch),
+        border: Border.all(color: Colors.white12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(50),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          )
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: color, size: 22),
+          Icon(icon, color: color, size: 24),
           const Spacer(),
-          Text(value, style: theme.textTheme.headlineMedium),
-          Text(label, style: theme.textTheme.bodySmall),
+          Text(value, style: theme.textTheme.headlineMedium?.copyWith(color: Colors.white)),
+          Text(label, style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70)),
         ],
       ),
     );
@@ -202,13 +207,13 @@ class _QuickAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ActionChip(
-      avatar: Icon(icon, size: 18, color: AppColors.indigo),
-      label: Text(label),
+      avatar: Icon(icon, size: 18, color: AppColors.goldAccent),
+      label: Text(label, style: const TextStyle(color: Colors.white)),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSizes.radiusField),
-        side: const BorderSide(color: AppColors.stitch),
+        side: const BorderSide(color: Colors.white12),
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.darkSurface,
       onPressed: () {},
     );
   }
@@ -231,13 +236,13 @@ class _ComingSoon extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 64, color: AppColors.inkSoft),
+            Icon(icon, size: 64, color: Colors.white38),
             const SizedBox(height: AppSizes.md),
-            Text(title, style: theme.textTheme.headlineMedium),
+            Text(title, style: theme.textTheme.headlineMedium?.copyWith(color: Colors.white)),
             const SizedBox(height: AppSizes.sm),
             Text(body,
                 textAlign: TextAlign.center,
-                style: theme.textTheme.bodySmall),
+                style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70)),
           ],
         ),
       ),

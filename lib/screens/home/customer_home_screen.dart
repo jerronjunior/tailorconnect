@@ -1,22 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_sizes.dart';
 import '../../providers/auth_providers.dart';
 import '../../widgets/glass_card.dart';
 
-/// Customer dashboard shell (Module 1).
-///
-/// Layout, navigation, and section scaffolding are final; the tailor lists
-/// are wired to live Firestore queries in Module 2 (Tailor Discovery).
 class CustomerHomeScreen extends ConsumerStatefulWidget {
   const CustomerHomeScreen({super.key});
 
   @override
-  ConsumerState<CustomerHomeScreen> createState() =>
-      _CustomerHomeScreenState();
+  ConsumerState<CustomerHomeScreen> createState() => _CustomerHomeScreenState();
 }
 
 class _CustomerHomeScreenState extends ConsumerState<CustomerHomeScreen> {
@@ -25,48 +21,48 @@ class _CustomerHomeScreenState extends ConsumerState<CustomerHomeScreen> {
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(appUserProvider).valueOrNull;
-    final firstName =
-        (user?.fullName ?? '').split(' ').firstOrNull ?? 'there';
+    final firstName = (user?.fullName ?? '').split(' ').firstOrNull ?? 'there';
 
     return Scaffold(
+      backgroundColor: AppColors.darkBackground,
       body: SafeArea(
         child: IndexedStack(
           index: _tab,
           children: [
             _HomeTab(firstName: firstName),
             const _PlaceholderTab(
-                icon: Icons.receipt_long_outlined,
+                icon: LucideIcons.receipt,
                 title: 'Orders',
                 body: 'Your orders will appear here (Module 4).'),
             const _PlaceholderTab(
-                icon: Icons.chat_bubble_outline,
+                icon: LucideIcons.messageSquare,
                 title: 'Messages',
                 body: 'Chats with tailors arrive in Module 6.'),
-            _ProfileTab(onSignOut: () =>
-                ref.read(authControllerProvider.notifier).signOut()),
+            _ProfileTab(onSignOut: () => ref.read(authControllerProvider.notifier).signOut()),
           ],
         ),
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _tab,
         onDestinationSelected: (i) => setState(() => _tab = i),
-        indicatorColor: AppColors.threadGoldLight.withOpacity(0.35),
+        backgroundColor: AppColors.darkSurface,
+        indicatorColor: AppColors.goldAccent.withAlpha(50),
         destinations: const [
           NavigationDestination(
-              icon: Icon(Icons.home_outlined),
-              selectedIcon: Icon(Icons.home),
+              icon: Icon(LucideIcons.home, color: Colors.white70),
+              selectedIcon: Icon(LucideIcons.home, color: AppColors.goldAccent),
               label: 'Home'),
           NavigationDestination(
-              icon: Icon(Icons.receipt_long_outlined),
-              selectedIcon: Icon(Icons.receipt_long),
+              icon: Icon(LucideIcons.receipt, color: Colors.white70),
+              selectedIcon: Icon(LucideIcons.receipt, color: AppColors.goldAccent),
               label: 'Orders'),
           NavigationDestination(
-              icon: Icon(Icons.chat_bubble_outline),
-              selectedIcon: Icon(Icons.chat_bubble),
+              icon: Icon(LucideIcons.messageSquare, color: Colors.white70),
+              selectedIcon: Icon(LucideIcons.messageSquare, color: AppColors.goldAccent),
               label: 'Chat'),
           NavigationDestination(
-              icon: Icon(Icons.person_outline),
-              selectedIcon: Icon(Icons.person),
+              icon: Icon(LucideIcons.user, color: Colors.white70),
+              selectedIcon: Icon(LucideIcons.user, color: AppColors.goldAccent),
               label: 'Profile'),
         ],
       ),
@@ -80,12 +76,12 @@ class _HomeTab extends StatelessWidget {
   final String firstName;
 
   static const _categories = [
-    ('Men', Icons.man_outlined),
-    ('Women', Icons.woman_outlined),
-    ('Kids', Icons.child_care_outlined),
-    ('Wedding', Icons.favorite_outline),
-    ('Office', Icons.work_outline),
-    ('Traditional', Icons.auto_awesome_outlined),
+    ('Men', LucideIcons.user),
+    ('Women', LucideIcons.userCircle),
+    ('Kids', LucideIcons.baby),
+    ('Wedding', LucideIcons.heart),
+    ('Office', LucideIcons.briefcase),
+    ('Traditional', LucideIcons.sparkles),
   ];
 
   @override
@@ -94,31 +90,37 @@ class _HomeTab extends StatelessWidget {
 
     return RefreshIndicator(
       onRefresh: () async {
-        // Module 2: re-run nearby/popular tailor queries.
         await Future<void>.delayed(const Duration(milliseconds: 600));
       },
       child: ListView(
         padding: const EdgeInsets.all(AppSizes.md),
         children: [
-          Text('Hello, $firstName 👋', style: theme.textTheme.headlineMedium)
+          Text('Hello, $firstName 👋', style: theme.textTheme.headlineMedium?.copyWith(color: Colors.white))
               .animate()
               .fadeIn()
               .moveY(begin: 8),
           Text('Find the perfect tailor for your next outfit',
-              style: theme.textTheme.bodySmall),
+              style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70)),
           const SizedBox(height: AppSizes.md),
 
           // Search
           TextField(
             readOnly: true,
+            style: const TextStyle(color: Colors.white),
             onTap: () {
-              // Module 2: push tailor search screen.
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                   content: Text('Tailor search arrives in Module 2.')));
             },
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               hintText: 'Search tailors, styles, fabrics…',
-              prefixIcon: Icon(Icons.search),
+              hintStyle: const TextStyle(color: Colors.white38),
+              prefixIcon: const Icon(LucideIcons.search, color: Colors.white54),
+              filled: true,
+              fillColor: AppColors.darkSurfaceHighlight,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppSizes.radiusField),
+                borderSide: BorderSide.none,
+              ),
             ),
           ),
           const SizedBox(height: AppSizes.lg),
@@ -128,16 +130,23 @@ class _HomeTab extends StatelessWidget {
             height: 150,
             padding: const EdgeInsets.all(AppSizes.lg),
             decoration: BoxDecoration(
-              gradient: AppColors.brandGradient,
+              gradient: AppColors.luxuryGradient,
               borderRadius: BorderRadius.circular(AppSizes.radiusCard),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.goldAccent.withAlpha(100),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                )
+              ]
             ),
             child: Stack(
               children: [
                 const Positioned(
                   right: 0,
                   bottom: 0,
-                  child: Icon(Icons.content_cut,
-                      size: 96, color: Colors.white12),
+                  child: Icon(LucideIcons.scissors,
+                      size: 96, color: Colors.black12),
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -148,7 +157,7 @@ class _HomeTab extends StatelessWidget {
                       borderRadius: AppSizes.sm,
                       child: Text('NEW HERE?',
                           style: TextStyle(
-                              color: AppColors.threadGoldLight,
+                              color: Colors.white,
                               fontSize: 11,
                               letterSpacing: 1.2,
                               fontWeight: FontWeight.w700)),
@@ -156,11 +165,11 @@ class _HomeTab extends StatelessWidget {
                     const Spacer(),
                     Text('20% off your first order',
                         style: theme.textTheme.titleLarge
-                            ?.copyWith(color: Colors.white)),
+                            ?.copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
                     const SizedBox(height: AppSizes.xs),
                     const Text('Use code WELCOME20 at checkout',
                         style:
-                            TextStyle(color: Colors.white70, fontSize: 13)),
+                            TextStyle(color: Colors.white, fontSize: 13)),
                   ],
                 ),
               ],
@@ -169,7 +178,7 @@ class _HomeTab extends StatelessWidget {
           const SizedBox(height: AppSizes.lg),
 
           // Categories
-          Text('Categories', style: theme.textTheme.titleLarge),
+          Text('Categories', style: theme.textTheme.titleLarge?.copyWith(color: Colors.white)),
           const SizedBox(height: AppSizes.md),
           SizedBox(
             height: 92,
@@ -186,15 +195,15 @@ class _HomeTab extends StatelessWidget {
                       width: 60,
                       height: 60,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.darkSurfaceHighlight,
                         borderRadius:
                             BorderRadius.circular(AppSizes.radiusField),
-                        border: Border.all(color: AppColors.stitch),
+                        border: Border.all(color: Colors.white12),
                       ),
-                      child: Icon(icon, color: AppColors.indigo),
+                      child: Icon(icon, color: AppColors.goldAccent),
                     ),
                     const SizedBox(height: AppSizes.xs),
-                    Text(label, style: theme.textTheme.bodySmall),
+                    Text(label, style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70)),
                   ],
                 ).animate(delay: (60 * i).ms).fadeIn().moveX(begin: 12);
               },
@@ -202,7 +211,6 @@ class _HomeTab extends StatelessWidget {
           ),
           const SizedBox(height: AppSizes.lg),
 
-          // Nearby tailors — skeleton until Module 2 wires Firestore.
           _SectionHeader(
               title: 'Nearby tailors', onSeeAll: () {}),
           const SizedBox(height: AppSizes.md),
@@ -229,15 +237,13 @@ class _SectionHeader extends StatelessWidget {
       children: [
         Expanded(
             child:
-                Text(title, style: Theme.of(context).textTheme.titleLarge)),
-        TextButton(onPressed: onSeeAll, child: const Text('See all')),
+                Text(title, style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.white))),
+        TextButton(onPressed: onSeeAll, child: const Text('See all', style: TextStyle(color: AppColors.goldAccent))),
       ],
     );
   }
 }
 
-/// Horizontal skeleton cards shown while tailor data loads (and until the
-/// Module 2 Firestore queries land).
 class _TailorListSkeleton extends StatelessWidget {
   const _TailorListSkeleton();
 
@@ -252,18 +258,18 @@ class _TailorListSkeleton extends StatelessWidget {
         itemBuilder: (_, i) => Container(
           width: 220,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.darkSurface,
             borderRadius: BorderRadius.circular(AppSizes.radiusCard),
-            border: Border.all(color: AppColors.stitch),
+            border: Border.all(color: Colors.white12),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 height: 110,
-                decoration: BoxDecoration(
-                  color: AppColors.stitch.withOpacity(0.6),
-                  borderRadius: const BorderRadius.vertical(
+                decoration: const BoxDecoration(
+                  color: Colors.white12,
+                  borderRadius: BorderRadius.vertical(
                       top: Radius.circular(AppSizes.radiusCard)),
                 ),
               ).animate(onPlay: (c) => c.repeat(reverse: true)).fade(
@@ -276,12 +282,12 @@ class _TailorListSkeleton extends StatelessWidget {
                     Container(
                         width: 130,
                         height: 12,
-                        color: AppColors.stitch.withOpacity(0.8)),
+                        color: Colors.white24),
                     const SizedBox(height: AppSizes.sm),
                     Container(
                         width: 80,
                         height: 10,
-                        color: AppColors.stitch.withOpacity(0.5)),
+                        color: Colors.white12),
                   ],
                 ),
               ),
@@ -310,13 +316,13 @@ class _PlaceholderTab extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 64, color: AppColors.inkSoft),
+            Icon(icon, size: 64, color: Colors.white38),
             const SizedBox(height: AppSizes.md),
-            Text(title, style: theme.textTheme.headlineMedium),
+            Text(title, style: theme.textTheme.headlineMedium?.copyWith(color: Colors.white)),
             const SizedBox(height: AppSizes.sm),
             Text(body,
                 textAlign: TextAlign.center,
-                style: theme.textTheme.bodySmall),
+                style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70)),
           ],
         ),
       ),
@@ -340,7 +346,7 @@ class _ProfileTab extends ConsumerWidget {
         Center(
           child: CircleAvatar(
             radius: 44,
-            backgroundColor: AppColors.indigo,
+            backgroundColor: AppColors.goldAccent,
             backgroundImage: user?.photoUrl != null
                 ? NetworkImage(user!.photoUrl!)
                 : null,
@@ -350,7 +356,7 @@ class _ProfileTab extends ConsumerWidget {
                         ? user!.fullName[0].toUpperCase()
                         : '?',
                     style: const TextStyle(
-                        color: Colors.white, fontSize: 32),
+                        color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
                   )
                 : null,
           ),
@@ -358,34 +364,32 @@ class _ProfileTab extends ConsumerWidget {
         const SizedBox(height: AppSizes.md),
         Center(
             child: Text(user?.fullName ?? '',
-                style: theme.textTheme.headlineMedium)),
+                style: theme.textTheme.headlineMedium?.copyWith(color: Colors.white))),
         Center(
             child:
-                Text(user?.email ?? '', style: theme.textTheme.bodySmall)),
+                Text(user?.email ?? '', style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70))),
         const SizedBox(height: AppSizes.xl),
-        // Full profile management (addresses, measurements, payment methods)
-        // ships in Modules 3 and 7.
         ListTile(
-          leading: const Icon(Icons.straighten_outlined),
-          title: const Text('My measurements'),
-          trailing: const Icon(Icons.chevron_right),
+          leading: const Icon(LucideIcons.ruler, color: Colors.white),
+          title: const Text('My measurements', style: TextStyle(color: Colors.white)),
+          trailing: const Icon(LucideIcons.chevronRight, color: Colors.white54),
           onTap: () {},
         ),
         ListTile(
-          leading: const Icon(Icons.location_on_outlined),
-          title: const Text('Addresses'),
-          trailing: const Icon(Icons.chevron_right),
+          leading: const Icon(LucideIcons.mapPin, color: Colors.white),
+          title: const Text('Addresses', style: TextStyle(color: Colors.white)),
+          trailing: const Icon(LucideIcons.chevronRight, color: Colors.white54),
           onTap: () {},
         ),
         ListTile(
-          leading: const Icon(Icons.settings_outlined),
-          title: const Text('Settings'),
-          trailing: const Icon(Icons.chevron_right),
+          leading: const Icon(LucideIcons.settings, color: Colors.white),
+          title: const Text('Settings', style: TextStyle(color: Colors.white)),
+          trailing: const Icon(LucideIcons.chevronRight, color: Colors.white54),
           onTap: () {},
         ),
-        const Divider(),
+        const Divider(color: Colors.white12),
         ListTile(
-          leading: const Icon(Icons.logout, color: AppColors.error),
+          leading: const Icon(LucideIcons.logOut, color: AppColors.error),
           title:
               const Text('Log out', style: TextStyle(color: AppColors.error)),
           onTap: onSignOut,

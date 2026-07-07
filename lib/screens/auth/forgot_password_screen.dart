@@ -2,22 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_sizes.dart';
 import '../../core/constants/app_strings.dart';
 import '../../core/utils/validators.dart';
 import '../../providers/auth_providers.dart';
-import '../../widgets/app_text_field.dart';
-import '../../widgets/primary_button.dart';
+import '../../widgets/premium_text_field.dart';
+import '../../widgets/luxury_button.dart';
 
-/// Sends a Firebase password-reset email, then shows a confirmation state.
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
-  ConsumerState<ForgotPasswordScreen> createState() =>
-      _ForgotPasswordScreenState();
+  ConsumerState<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
 class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
@@ -56,14 +55,14 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     final isLoading = ref.watch(authControllerProvider).isLoading;
 
     return Scaffold(
-      appBar: AppBar(leading: const BackButton()),
+      backgroundColor: AppColors.darkBackground,
+      appBar: AppBar(leading: const BackButton(color: Colors.white)),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(AppSizes.lg),
             child: ConstrainedBox(
-              constraints:
-                  const BoxConstraints(maxWidth: AppSizes.maxContentWidth),
+              constraints: const BoxConstraints(maxWidth: AppSizes.maxContentWidth),
               child: _sent ? _buildSent(theme, context) : _buildForm(theme, isLoading),
             ),
           ),
@@ -78,26 +77,26 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(AppStrings.resetPassword, style: theme.textTheme.headlineMedium)
-              .animate()
-              .fadeIn()
-              .moveY(begin: 12),
+          Text(
+            AppStrings.resetPassword, 
+            style: theme.textTheme.headlineMedium?.copyWith(color: AppColors.goldAccent)
+          ).animate().fadeIn().moveY(begin: 12),
           const SizedBox(height: AppSizes.sm),
-          Text(AppStrings.resetPasswordHint, style: theme.textTheme.bodySmall),
+          Text(
+            AppStrings.resetPasswordHint, 
+            style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70)
+          ),
           const SizedBox(height: AppSizes.lg),
-          AppTextField(
-            label: AppStrings.email,
+          PremiumTextField(
+            hintText: AppStrings.email,
             controller: _emailController,
-            hint: 'you@example.com',
             keyboardType: TextInputType.emailAddress,
-            prefixIcon: Icons.mail_outline,
+            prefixIcon: LucideIcons.mail,
             validator: Validators.email,
-            textInputAction: TextInputAction.done,
-            autofillHints: const [AutofillHints.email],
           ),
           const SizedBox(height: AppSizes.xl),
-          PrimaryButton(
-            label: AppStrings.sendResetLink,
+          LuxuryButton(
+            text: AppStrings.sendResetLink,
             isLoading: isLoading,
             onPressed: _submit,
           ),
@@ -110,28 +109,24 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Icon(Icons.mark_email_read_outlined,
-                size: 72, color: AppColors.success)
+        const Icon(LucideIcons.mailCheck, size: 72, color: AppColors.goldAccent)
             .animate()
-            .scale(begin: const Offset(0.6, 0.6), curve: Curves.elasticOut,
-                duration: 600.ms),
+            .scale(begin: const Offset(0.6, 0.6), curve: Curves.elasticOut, duration: 600.ms),
         const SizedBox(height: AppSizes.lg),
         Text(
           'Check your inbox',
           textAlign: TextAlign.center,
-          style: theme.textTheme.headlineMedium,
+          style: theme.textTheme.headlineMedium?.copyWith(color: Colors.white),
         ),
         const SizedBox(height: AppSizes.sm),
         Text(
-          'We sent a password reset link to '
-          '${_emailController.text.trim()}. Follow the link to set a new '
-          'password, then log in again.',
+          'We sent a password reset link to ${_emailController.text.trim()}. Follow the link to set a new password, then log in again.',
           textAlign: TextAlign.center,
-          style: theme.textTheme.bodyMedium,
+          style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white70),
         ),
         const SizedBox(height: AppSizes.xl),
-        PrimaryButton(
-          label: 'Back to log in',
+        LuxuryButton(
+          text: 'BACK TO LOG IN',
           onPressed: () => context.pop(),
         ),
       ],

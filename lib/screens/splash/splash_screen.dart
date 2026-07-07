@@ -1,73 +1,96 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
 
-/// Animated splash. Navigation away from here is handled entirely by the
-/// GoRouter redirect (auth state + onboarding flag), so this screen only
-/// needs to look good while auth resolves.
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.darkBackground,
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.brandGradient),
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: NetworkImage('https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=600&auto=format&fit=crop'),
+            fit: BoxFit.cover,
+            opacity: 0.15,
+          ),
+        ),
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Logo mark: a spool of thread rendered with layered circles.
+              // 3D-like floating icon
               Container(
-                width: 96,
-                height: 96,
+                width: 120,
+                height: 120,
                 decoration: BoxDecoration(
-                  gradient: AppColors.goldGradient,
+                  gradient: AppColors.luxuryGradient,
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.threadGold.withOpacity(0.45),
-                      blurRadius: 40,
-                      spreadRadius: 4,
+                      color: AppColors.goldAccent.withOpacity(0.5),
+                      blurRadius: 50,
+                      spreadRadius: 10,
+                      offset: const Offset(0, 10),
+                    ),
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.7),
+                      blurRadius: 20,
+                      spreadRadius: 2,
+                      offset: const Offset(0, -5),
                     ),
                   ],
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.3),
+                    width: 2,
+                  )
                 ),
                 child: const Icon(
-                  Icons.content_cut_rounded,
-                  size: 44,
-                  color: AppColors.indigoDeep,
+                  LucideIcons.scissors,
+                  size: 56,
+                  color: Colors.white,
                 ),
               )
-                  .animate()
-                  .scale(
-                    duration: 600.ms,
-                    curve: Curves.easeOutBack,
-                    begin: const Offset(0.6, 0.6),
-                  )
+                  .animate(onPlay: (controller) => controller.repeat(reverse: true))
+                  .moveY(begin: -8, end: 8, duration: 2.seconds, curve: Curves.easeInOut)
                   .then()
-                  .shimmer(duration: 1200.ms, color: Colors.white38),
-              const SizedBox(height: 28),
+                  .shimmer(duration: 2.seconds, color: Colors.white54),
+              
+              const SizedBox(height: 40),
+              
               Text(
-                AppStrings.appName,
+                AppStrings.appName.toUpperCase(),
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      color: Colors.white,
-                      letterSpacing: 0.5,
+                      color: AppColors.goldAccent,
+                      letterSpacing: 4.0,
+                      fontWeight: FontWeight.w800,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black.withOpacity(0.8),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        )
+                      ]
                     ),
-              ).animate(delay: 250.ms).fadeIn(duration: 500.ms).slideY(
-                    begin: 0.3,
+              ).animate().fadeIn(duration: 800.ms, delay: 300.ms).slideY(
+                    begin: 0.2,
                     curve: Curves.easeOut,
                   ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               const Text(
                 AppStrings.tagline,
                 style: TextStyle(
                   color: Colors.white70,
-                  fontSize: 15,
-                  letterSpacing: 1.2,
+                  fontSize: 16,
+                  letterSpacing: 2.0,
+                  fontWeight: FontWeight.w300,
                 ),
-              ).animate(delay: 500.ms).fadeIn(duration: 500.ms),
+              ).animate().fadeIn(duration: 800.ms, delay: 600.ms),
             ],
           ),
         ),

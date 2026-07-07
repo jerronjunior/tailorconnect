@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_sizes.dart';
@@ -11,12 +12,10 @@ import '../../core/router/app_router.dart';
 import '../../core/utils/validators.dart';
 import '../../models/app_user.dart';
 import '../../providers/auth_providers.dart';
-import '../../widgets/app_text_field.dart';
+import '../../widgets/premium_text_field.dart';
 import '../../widgets/glass_card.dart';
-import '../../widgets/primary_button.dart';
+import '../../widgets/luxury_button.dart';
 
-/// Email/password + Google login on a brand-gradient background with a
-/// frosted glass form card.
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -95,187 +94,163 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final isLoading = authState.isLoading;
 
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.brandGradient),
-        child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(AppSizes.lg),
-              child: ConstrainedBox(
-                constraints:
-                    const BoxConstraints(maxWidth: AppSizes.maxContentWidth),
-                child: Column(
-                  children: [
-                    // Brand mark
-                    const Icon(Icons.content_cut,
-                            color: AppColors.threadGoldLight, size: 44)
-                        .animate()
-                        .fadeIn(duration: 400.ms)
-                        .scale(begin: const Offset(0.8, 0.8)),
-                    const SizedBox(height: AppSizes.sm),
-                    Text(
-                      AppStrings.appName,
-                      style: Theme.of(context)
-                          .textTheme
-                          .headlineLarge
-                          ?.copyWith(color: Colors.white),
-                    ),
-                    Text(
-                      AppStrings.tagline,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodySmall
-                          ?.copyWith(color: Colors.white70),
-                    ),
-                    const SizedBox(height: AppSizes.xl),
+      body: Stack(
+        children: [
+          // Background Image with Dark Gradient
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: NetworkImage('https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=800&auto=format&fit=crop'),
+                fit: BoxFit.cover,
+                opacity: 0.3,
+              ),
+            ),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  AppColors.darkBackground.withOpacity(0.5),
+                  AppColors.darkBackground.withOpacity(0.9),
+                  AppColors.darkBackground,
+                ],
+              ),
+            ),
+          ),
+          
+          SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(AppSizes.lg),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: AppSizes.maxContentWidth),
+                  child: Column(
+                    children: [
+                      // Brand mark
+                      const Icon(LucideIcons.scissors, color: AppColors.goldAccent, size: 48)
+                          .animate()
+                          .fadeIn(duration: 400.ms)
+                          .scale(begin: const Offset(0.8, 0.8)),
+                      const SizedBox(height: AppSizes.sm),
+                      Text(
+                        AppStrings.appName.toUpperCase(),
+                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                              color: Colors.white,
+                              letterSpacing: 3,
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ).animate().fadeIn(delay: 200.ms),
+                      Text(
+                        AppStrings.tagline,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: AppColors.goldAccentLight,
+                              letterSpacing: 1.5,
+                            ),
+                      ).animate().fadeIn(delay: 400.ms),
+                      const SizedBox(height: AppSizes.xl),
 
-                    GlassCard(
-                      child: Form(
-                        key: _formKey,
-                        child: AutofillGroup(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Theme(
-                                // Glass card sits on a dark gradient, so the
-                                // form uses light-on-dark styling locally.
-                                data: _glassFieldTheme(context),
-                                child: Column(
+                      GlassCard(
+                        blur: 24,
+                        opacity: 0.1,
+                        child: Form(
+                          key: _formKey,
+                          child: AutofillGroup(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                PremiumTextField(
+                                  hintText: AppStrings.email,
+                                  controller: _emailController,
+                                  keyboardType: TextInputType.emailAddress,
+                                  validator: Validators.email,
+                                  prefixIcon: LucideIcons.mail,
+                                ),
+                                const SizedBox(height: AppSizes.md),
+                                PremiumTextField(
+                                  hintText: AppStrings.password,
+                                  controller: _passwordController,
+                                  isPassword: true,
+                                  validator: (v) => (v == null || v.isEmpty)
+                                      ? 'Password is required'
+                                      : null,
+                                  prefixIcon: LucideIcons.lock,
+                                ),
+                                const SizedBox(height: AppSizes.sm),
+                                Row(
                                   children: [
-                                    AppTextField(
-                                      label: AppStrings.email,
-                                      controller: _emailController,
-                                      hint: 'you@example.com',
-                                      keyboardType:
-                                          TextInputType.emailAddress,
-                                      validator: Validators.email,
-                                      prefixIcon: Icons.mail_outline,
-                                      textInputAction: TextInputAction.next,
-                                      autofillHints: const [
-                                        AutofillHints.email
-                                      ],
+                                    SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: Checkbox(
+                                        value: _rememberMe,
+                                        activeColor: AppColors.goldAccent,
+                                        checkColor: AppColors.darkBackground,
+                                        side: const BorderSide(color: Colors.white54),
+                                        onChanged: (v) => setState(() => _rememberMe = v ?? false),
+                                      ),
                                     ),
-                                    const SizedBox(height: AppSizes.md),
-                                    AppTextField(
-                                      label: AppStrings.password,
-                                      controller: _passwordController,
-                                      obscure: true,
-                                      validator: (v) => (v == null || v.isEmpty)
-                                          ? 'Password is required'
-                                          : null,
-                                      prefixIcon: Icons.lock_outline,
-                                      textInputAction: TextInputAction.done,
-                                      autofillHints: const [
-                                        AutofillHints.password
-                                      ],
+                                    const SizedBox(width: AppSizes.sm),
+                                    const Text(
+                                      AppStrings.rememberMe,
+                                      style: TextStyle(color: Colors.white70, fontSize: 13),
+                                    ),
+                                    const Spacer(),
+                                    TextButton(
+                                      onPressed: isLoading ? null : () => context.push(Routes.forgotPassword),
+                                      child: const Text(
+                                        AppStrings.forgotPassword,
+                                        style: TextStyle(color: AppColors.goldAccent, fontSize: 13),
+                                      ),
                                     ),
                                   ],
                                 ),
-                              ),
-                              const SizedBox(height: AppSizes.sm),
-                              Row(
-                                children: [
-                                  SizedBox(
-                                    width: 24,
-                                    height: 24,
-                                    child: Checkbox(
-                                      value: _rememberMe,
-                                      activeColor: AppColors.threadGold,
-                                      side: const BorderSide(
-                                          color: Colors.white70),
-                                      onChanged: (v) => setState(
-                                          () => _rememberMe = v ?? false),
-                                    ),
-                                  ),
-                                  const SizedBox(width: AppSizes.sm),
-                                  const Text(
-                                    AppStrings.rememberMe,
-                                    style: TextStyle(
-                                        color: Colors.white70, fontSize: 13),
-                                  ),
-                                  const Spacer(),
-                                  TextButton(
-                                    onPressed: isLoading
-                                        ? null
-                                        : () => context
-                                            .push(Routes.forgotPassword),
-                                    child: const Text(
-                                      AppStrings.forgotPassword,
-                                      style: TextStyle(
-                                        color: AppColors.threadGoldLight,
-                                        fontSize: 13,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: AppSizes.md),
-                              PrimaryButton(
-                                label: AppStrings.login,
-                                isLoading: isLoading,
-                                onPressed: _submit,
-                              ),
-                              const SizedBox(height: AppSizes.md),
-                              const _OrDivider(),
-                              const SizedBox(height: AppSizes.md),
-                              _GoogleButton(
-                                onPressed: isLoading ? null : _googleSignIn,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ).animate().fadeIn(delay: 150.ms).moveY(begin: 24),
-
-                    const SizedBox(height: AppSizes.lg),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text(
-                          AppStrings.noAccount,
-                          style: TextStyle(color: Colors.white70),
-                        ),
-                        TextButton(
-                          onPressed: isLoading
-                              ? null
-                              : () => context.push(Routes.roleSelection),
-                          child: const Text(
-                            AppStrings.register,
-                            style: TextStyle(
-                              color: AppColors.threadGoldLight,
-                              fontWeight: FontWeight.w600,
+                                const SizedBox(height: AppSizes.md),
+                                LuxuryButton(
+                                  text: AppStrings.login,
+                                  isLoading: isLoading,
+                                  onPressed: _submit,
+                                ),
+                                const SizedBox(height: AppSizes.md),
+                                const _OrDivider(),
+                                const SizedBox(height: AppSizes.md),
+                                _GoogleButton(
+                                  onPressed: isLoading ? null : _googleSignIn,
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                  ],
+                      ).animate().fadeIn(delay: 300.ms).moveY(begin: 30),
+
+                      const SizedBox(height: AppSizes.lg),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            AppStrings.noAccount,
+                            style: TextStyle(color: Colors.white70),
+                          ),
+                          TextButton(
+                            onPressed: isLoading ? null : () => context.push(Routes.roleSelection),
+                            child: const Text(
+                              AppStrings.register,
+                              style: TextStyle(
+                                color: AppColors.goldAccent,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  /// Field styling tuned for the frosted card on the dark gradient.
-  ThemeData _glassFieldTheme(BuildContext context) {
-    final base = Theme.of(context);
-    return base.copyWith(
-      textTheme: base.textTheme.apply(
-        bodyColor: Colors.white,
-        displayColor: Colors.white,
-      ),
-      inputDecorationTheme: base.inputDecorationTheme.copyWith(
-        fillColor: Colors.white.withOpacity(0.08),
-        hintStyle: const TextStyle(color: Colors.white38),
-        prefixIconColor: Colors.white54,
-        suffixIconColor: Colors.white54,
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSizes.radiusField),
-          borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
-        ),
+        ],
       ),
     );
   }
@@ -288,12 +263,12 @@ class _OrDivider extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Expanded(child: Divider(color: Colors.white.withOpacity(0.25))),
+        Expanded(child: Divider(color: Colors.white.withOpacity(0.15))),
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: AppSizes.md),
           child: Text('or', style: TextStyle(color: Colors.white54)),
         ),
-        Expanded(child: Divider(color: Colors.white.withOpacity(0.25))),
+        Expanded(child: Divider(color: Colors.white.withOpacity(0.15))),
       ],
     );
   }
@@ -310,14 +285,14 @@ class _GoogleButton extends StatelessWidget {
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
         foregroundColor: Colors.white,
-        side: BorderSide(color: Colors.white.withOpacity(0.4)),
+        side: BorderSide(color: Colors.white.withOpacity(0.2)),
         minimumSize: const Size.fromHeight(AppSizes.buttonHeight),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSizes.radiusButton),
         ),
       ),
-      icon: const Icon(Icons.g_mobiledata, size: 30),
-      label: const Text(AppStrings.continueWithGoogle),
+      icon: const Icon(Icons.g_mobiledata, size: 32, color: Colors.white),
+      label: const Text('CONTINUE WITH GOOGLE', style: TextStyle(letterSpacing: 1.2)),
     );
   }
 }
