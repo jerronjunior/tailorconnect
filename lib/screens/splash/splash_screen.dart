@@ -60,9 +60,9 @@ class SplashScreen extends StatelessWidget {
                     curve: Curves.easeOut,
                   ),
               const SizedBox(height: 8),
-              Text(
+              const Text(
                 AppStrings.tagline,
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.white70,
                   fontSize: 15,
                   letterSpacing: 1.2,

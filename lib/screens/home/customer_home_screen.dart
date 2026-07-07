@@ -142,11 +142,11 @@ class _HomeTab extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    GlassCard(
-                      padding: const EdgeInsets.symmetric(
+                    const GlassCard(
+                      padding: EdgeInsets.symmetric(
                           horizontal: AppSizes.sm, vertical: AppSizes.xs),
                       borderRadius: AppSizes.sm,
-                      child: const Text('NEW HERE?',
+                      child: Text('NEW HERE?',
                           style: TextStyle(
                               color: AppColors.threadGoldLight,
                               fontSize: 11,

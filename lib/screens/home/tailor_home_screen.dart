@@ -143,10 +143,10 @@ class _DashboardTab extends ConsumerWidget {
 
         Text('Quick actions', style: theme.textTheme.titleLarge),
         const SizedBox(height: AppSizes.md),
-        Wrap(
+        const Wrap(
           spacing: AppSizes.md,
           runSpacing: AppSizes.md,
-          children: const [
+          children: [
             _QuickAction(icon: Icons.add_a_photo_outlined, label: 'Add portfolio'),
             _QuickAction(icon: Icons.schedule_outlined, label: 'Set hours'),
             _QuickAction(icon: Icons.request_quote_outlined, label: 'Send quote'),
