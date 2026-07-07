@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "221344695094",
+    "project_id": "tailorconnect-b25b5",
+    "storage_bucket": "tailorconnect-b25b5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:221344695094:android:a441b83c06f4ec35c7e997",
+        "android_client_info": {
+          "package_name": "com.junior.tailorconnect"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "221344695094-rtuqudrp80lp5dv3io2r3dqgu6clr49p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBzqK20r2anWvr2FQIoQAxxo4ZRl7U8LcI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "221344695094-rtuqudrp80lp5dv3io2r3dqgu6clr49p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,4 +1,4 @@
-package com.example.tailorconnect
+package com.junior.tailorconnect
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -20,7 +20,11 @@ service cloud.firestore {
     // Tailor business profiles: public read, owner write.
     match /tailors/{uid} {
       allow read: if true;
-      allow create, update: if isOwner(uid) && userRole() == 'tailor';
+      allow create: if isOwner(uid) && (
+        getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'tailor' || 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'tailor'
+      );
+      allow update: if isOwner(uid) && userRole() == 'tailor';
       allow delete: if false;
     }
 

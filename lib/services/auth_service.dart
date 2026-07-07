@@ -140,6 +140,7 @@ class AuthService {
 
   /// Converts FirebaseAuthException codes into user-friendly messages.
   static String friendlyError(Object error) {
+    print('AuthService Error: $error'); // Help debugging in terminal
     if (error is FirebaseAuthException) {
       return switch (error.code) {
         'invalid-credential' ||
@@ -154,9 +155,12 @@ class AuthService {
           'Too many attempts. Wait a moment and try again.',
         'network-request-failed' =>
           'No connection. Check your internet and try again.',
-        _ => 'Something went wrong. Please try again.',
+        _ => 'Authentication failed: ${error.message ?? error.code}',
       };
     }
-    return 'Something went wrong. Please try again.';
+    if (error is FirebaseException) {
+      return 'Database error: ${error.message ?? error.code}';
+    }
+    return 'Unexpected error: $error';
   }
 }
