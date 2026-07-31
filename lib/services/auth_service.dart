@@ -123,7 +123,13 @@ class AuthService {
       _auth.sendPasswordResetEmail(email: email.trim());
 
   Future<void> signOut() async {
-    await _google.signOut();
+    // Google sign-out is best-effort (e.g. the web client ID may be
+    // unconfigured) and must never block the actual Firebase sign-out.
+    try {
+      await _google.signOut();
+    } catch (error) {
+      print('Google sign-out skipped: $error');
+    }
     await _auth.signOut();
   }
 
