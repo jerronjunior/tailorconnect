@@ -30,7 +30,7 @@ const _pages = [
     AppStrings.onboardBody2,
   ),
   _OnboardPage(
-    'https://images.unsplash.com/photo-1589465885857-44ed64637158?q=80&w=800&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=800&auto=format&fit=crop',
     AppStrings.onboardTitle3,
     AppStrings.onboardBody3,
   ),
@@ -78,6 +78,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   Image.network(
                     page.imageUrl,
                     fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      color: AppColors.darkBackground,
+                    ),
                   ),
                   // Dark gradient overlay
                   Container(
