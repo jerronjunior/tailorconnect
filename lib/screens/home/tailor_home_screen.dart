@@ -6,6 +6,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_sizes.dart';
 import '../../providers/auth_providers.dart';
+import '../orders/tailor_orders_screen.dart';
 import '../shop/shop_screen.dart';
 
 class TailorHomeScreen extends ConsumerStatefulWidget {
@@ -29,10 +30,7 @@ class _TailorHomeScreenState extends ConsumerState<TailorHomeScreen> {
           index: _tab,
           children: [
             _DashboardTab(name: user?.fullName ?? ''),
-            const _ComingSoon(
-                icon: LucideIcons.package,
-                title: 'Orders',
-                body: 'Incoming and active orders land here in Module 5.'),
+            const TailorOrdersScreen(),
             const _ComingSoon(
                 icon: LucideIcons.messageSquare,
                 title: 'Messages',
