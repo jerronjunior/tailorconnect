@@ -41,4 +41,22 @@ class OrderService {
       ]),
     });
   }
+
+  /// Sets or revises [orderId]'s price and records the quote in its status
+  /// history so the customer can see when and why it changed.
+  Future<void> sendQuote(String orderId, double price, {String? note}) {
+    final message = note?.trim();
+    return _orders.doc(orderId).update({
+      'price': price,
+      'statusHistory': FieldValue.arrayUnion([
+        {
+          'status': 'quote',
+          'timestamp': Timestamp.now(),
+          'note': (message == null || message.isEmpty)
+              ? 'Quote sent: \$${price.toStringAsFixed(2)}'
+              : 'Quote sent: \$${price.toStringAsFixed(2)} — $message',
+        },
+      ]),
+    });
+  }
 }

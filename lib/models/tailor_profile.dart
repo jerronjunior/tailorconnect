@@ -18,6 +18,7 @@ class TailorProfile extends Equatable {
     this.isAvailable = true,
     this.city,
     this.geo,
+    this.businessHours = const {},
   });
 
   final String uid;
@@ -34,6 +35,11 @@ class TailorProfile extends Equatable {
   final bool isAvailable;
   final String? city;
   final GeoPoint? geo;
+
+  /// Keyed by lowercase weekday name ('monday'..'sunday'). Each entry:
+  /// `{isOpen: bool, open: 'HH:mm', close: 'HH:mm'}`. Missing days count as
+  /// closed.
+  final Map<String, dynamic> businessHours;
 
   factory TailorProfile.fromDoc(DocumentSnapshot<Map<String, dynamic>> doc) {
     final d = doc.data() ?? const {};
@@ -52,6 +58,8 @@ class TailorProfile extends Equatable {
       isAvailable: d['isAvailable'] as bool? ?? true,
       city: d['city'] as String?,
       geo: d['geo'] as GeoPoint?,
+      businessHours:
+          Map<String, dynamic>.from(d['businessHours'] as Map? ?? const {}),
     );
   }
 
@@ -69,6 +77,7 @@ class TailorProfile extends Equatable {
         'isAvailable': isAvailable,
         'city': city,
         'geo': geo,
+        'businessHours': businessHours,
       };
 
   @override

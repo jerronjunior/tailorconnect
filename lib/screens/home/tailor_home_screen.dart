@@ -9,7 +9,10 @@ import '../../core/constants/app_sizes.dart';
 import '../../models/tailor_profile.dart';
 import '../../providers/auth_providers.dart';
 import '../../providers/tailor_providers.dart';
+import '../orders/send_quote_screen.dart';
 import '../orders/tailor_orders_screen.dart';
+import '../reviews/tailor_reviews_screen.dart';
+import '../shop/business_hours_screen.dart';
 import '../shop/shop_screen.dart';
 
 class TailorHomeScreen extends ConsumerStatefulWidget {
@@ -156,9 +159,27 @@ class _DashboardTab extends ConsumerWidget {
           children: [
             _QuickAction(
                 icon: LucideIcons.camera, label: 'Add portfolio', onTap: onOpenShop),
-            _QuickAction(icon: LucideIcons.clock, label: 'Set hours', onTap: () {}),
-            _QuickAction(icon: LucideIcons.fileText, label: 'Send quote', onTap: () {}),
-            _QuickAction(icon: LucideIcons.star, label: 'Reviews', onTap: () {}),
+            _QuickAction(
+              icon: LucideIcons.clock,
+              label: 'Set hours',
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const BusinessHoursScreen()),
+              ),
+            ),
+            _QuickAction(
+              icon: LucideIcons.fileText,
+              label: 'Send quote',
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const SendQuoteScreen()),
+              ),
+            ),
+            _QuickAction(
+              icon: LucideIcons.star,
+              label: 'Reviews',
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const TailorReviewsScreen()),
+              ),
+            ),
           ],
         ),
         const SizedBox(height: AppSizes.lg),
