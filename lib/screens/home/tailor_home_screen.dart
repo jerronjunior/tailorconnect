@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,7 +6,9 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_sizes.dart';
+import '../../models/tailor_profile.dart';
 import '../../providers/auth_providers.dart';
+import '../../providers/tailor_providers.dart';
 import '../orders/tailor_orders_screen.dart';
 import '../shop/shop_screen.dart';
 
@@ -29,7 +32,8 @@ class _TailorHomeScreenState extends ConsumerState<TailorHomeScreen> {
         child: IndexedStack(
           index: _tab,
           children: [
-            _DashboardTab(name: user?.fullName ?? ''),
+            _DashboardTab(
+                name: user?.fullName ?? '', onOpenShop: () => setState(() => _tab = 3)),
             const TailorOrdersScreen(),
             const _ComingSoon(
                 icon: LucideIcons.messageSquare,
@@ -68,13 +72,15 @@ class _TailorHomeScreenState extends ConsumerState<TailorHomeScreen> {
 }
 
 class _DashboardTab extends ConsumerWidget {
-  const _DashboardTab({required this.name});
+  const _DashboardTab({required this.name, required this.onOpenShop});
 
   final String name;
+  final VoidCallback onOpenShop;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final profileAsync = ref.watch(tailorProfileProvider);
 
     return ListView(
       padding: const EdgeInsets.all(AppSizes.md),
@@ -101,6 +107,14 @@ class _DashboardTab extends ConsumerWidget {
           ],
         ).animate().fadeIn().moveY(begin: 8),
         const SizedBox(height: AppSizes.lg),
+
+        if (profileAsync.valueOrNull != null) ...[
+          _ShopPreviewCard(profile: profileAsync.valueOrNull!, onTap: onOpenShop)
+              .animate()
+              .fadeIn(delay: 60.ms)
+              .moveY(begin: 12),
+          const SizedBox(height: AppSizes.lg),
+        ],
 
         GridView.count(
           crossAxisCount: 2,
@@ -136,18 +150,200 @@ class _DashboardTab extends ConsumerWidget {
 
         Text('Quick actions', style: theme.textTheme.titleLarge?.copyWith(color: Colors.white)),
         const SizedBox(height: AppSizes.md),
-        const Wrap(
+        Wrap(
           spacing: AppSizes.md,
           runSpacing: AppSizes.md,
           children: [
-            _QuickAction(icon: LucideIcons.camera, label: 'Add portfolio'),
-            _QuickAction(icon: LucideIcons.clock, label: 'Set hours'),
-            _QuickAction(icon: LucideIcons.fileText, label: 'Send quote'),
-            _QuickAction(icon: LucideIcons.star, label: 'Reviews'),
+            _QuickAction(
+                icon: LucideIcons.camera, label: 'Add portfolio', onTap: onOpenShop),
+            _QuickAction(icon: LucideIcons.clock, label: 'Set hours', onTap: () {}),
+            _QuickAction(icon: LucideIcons.fileText, label: 'Send quote', onTap: () {}),
+            _QuickAction(icon: LucideIcons.star, label: 'Reviews', onTap: () {}),
           ],
+        ),
+        const SizedBox(height: AppSizes.lg),
+
+        Row(
+          children: [
+            Expanded(
+              child: Text('Portfolio',
+                  style: theme.textTheme.titleLarge?.copyWith(color: Colors.white)),
+            ),
+            TextButton(
+              onPressed: onOpenShop,
+              child: const Text('Manage', style: TextStyle(color: AppColors.goldAccent)),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSizes.sm),
+        _PortfolioPreviewRow(
+          urls: profileAsync.valueOrNull?.portfolioUrls ?? const [],
+          onTap: onOpenShop,
         ),
       ],
     );
+  }
+}
+
+class _ShopPreviewCard extends StatelessWidget {
+  const _ShopPreviewCard({required this.profile, required this.onTap});
+
+  final TailorProfile profile;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 128,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(AppSizes.radiusCard),
+          border: Border.all(color: Colors.white12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(60),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            profile.coverUrl == null
+                ? Container(color: AppColors.darkSurfaceHighlight)
+                : CachedNetworkImage(imageUrl: profile.coverUrl!, fit: BoxFit.cover),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.black.withAlpha(10), Colors.black.withAlpha(190)],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(AppSizes.md),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.darkSurfaceHighlight,
+                      border: Border.all(color: Colors.white24, width: 1.5),
+                    ),
+                    child: ClipOval(
+                      child: profile.logoUrl == null
+                          ? const Icon(LucideIcons.store, color: Colors.white38, size: 22)
+                          : CachedNetworkImage(
+                              imageUrl: profile.logoUrl!, fit: BoxFit.cover),
+                    ),
+                  ),
+                  const SizedBox(width: AppSizes.sm),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          profile.businessName.isEmpty ? 'Your shop' : profile.businessName,
+                          style: theme.textTheme.titleMedium
+                              ?.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Row(
+                          children: [
+                            Icon(
+                              profile.isAvailable
+                                  ? LucideIcons.checkCircle
+                                  : LucideIcons.pauseCircle,
+                              color: profile.isAvailable
+                                  ? AppColors.success
+                                  : AppColors.warning,
+                              size: 14,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              profile.isAvailable ? 'Open for orders' : 'Not accepting orders',
+                              style: theme.textTheme.bodySmall
+                                  ?.copyWith(color: Colors.white70),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Icon(LucideIcons.chevronRight, color: Colors.white54),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PortfolioPreviewRow extends StatelessWidget {
+  const _PortfolioPreviewRow({required this.urls, required this.onTap});
+
+  final List<String> urls;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    if (urls.isEmpty) {
+      return GestureDetector(
+        onTap: onTap,
+        child: Container(
+          height: 96,
+          decoration: BoxDecoration(
+            color: AppColors.darkSurfaceHighlight,
+            borderRadius: BorderRadius.circular(AppSizes.radiusCard),
+            border: Border.all(color: Colors.white12),
+          ),
+          child: const Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(LucideIcons.image, color: Colors.white24, size: 28),
+                SizedBox(height: 4),
+                Text('Add photos of your work',
+                    style: TextStyle(color: Colors.white54, fontSize: 12)),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return SizedBox(
+      height: 96,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: urls.length,
+        separatorBuilder: (_, __) => const SizedBox(width: AppSizes.sm),
+        itemBuilder: (context, i) => GestureDetector(
+          onTap: onTap,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(AppSizes.radiusField),
+            child: CachedNetworkImage(
+              imageUrl: urls[i],
+              width: 96,
+              height: 96,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+      ),
+    ).animate().fadeIn(delay: 120.ms);
   }
 }
 
@@ -194,10 +390,11 @@ class _StatCard extends StatelessWidget {
 }
 
 class _QuickAction extends StatelessWidget {
-  const _QuickAction({required this.icon, required this.label});
+  const _QuickAction({required this.icon, required this.label, required this.onTap});
 
   final IconData icon;
   final String label;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -209,7 +406,7 @@ class _QuickAction extends StatelessWidget {
         side: const BorderSide(color: Colors.white12),
       ),
       backgroundColor: AppColors.darkSurface,
-      onPressed: () {},
+      onPressed: onTap,
     );
   }
 }
