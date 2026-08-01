@@ -6,6 +6,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_sizes.dart';
 import '../../providers/auth_providers.dart';
+import '../shop/shop_screen.dart';
 
 class TailorHomeScreen extends ConsumerStatefulWidget {
   const TailorHomeScreen({super.key});
@@ -36,11 +37,7 @@ class _TailorHomeScreenState extends ConsumerState<TailorHomeScreen> {
                 icon: LucideIcons.messageSquare,
                 title: 'Messages',
                 body: 'Customer chat arrives in Module 6.'),
-            const _ComingSoon(
-                icon: LucideIcons.store,
-                title: 'My shop',
-                body:
-                    'Business profile, portfolio, and hours arrive in Module 2.'),
+            const ShopScreen(),
           ],
         ),
       ),

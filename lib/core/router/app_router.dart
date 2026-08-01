@@ -25,15 +25,29 @@ abstract final class Routes {
   static const tailorHome = '/tailor';
 }
 
+/// Re-runs the router's redirect whenever auth or onboarding state changes,
+/// without recreating the GoRouter itself (which would reset navigation
+/// back to [Routes.splash] on every auth/Firestore update).
+class _RouterRefreshNotifier extends ChangeNotifier {
+  _RouterRefreshNotifier(Ref ref) {
+    ref.listen(authStateProvider, (_, __) => notifyListeners());
+    ref.listen(appUserProvider, (_, __) => notifyListeners());
+    ref.listen(onboardingSeenProvider, (_, __) => notifyListeners());
+  }
+}
+
 final routerProvider = Provider<GoRouter>((ref) {
-  // Re-run redirects whenever auth or onboarding state changes.
-  final authState = ref.watch(authStateProvider);
-  final appUser = ref.watch(appUserProvider);
-  final onboardingSeen = ref.watch(onboardingSeenProvider);
+  final refresh = _RouterRefreshNotifier(ref);
+  ref.onDispose(refresh.dispose);
 
   return GoRouter(
     initialLocation: Routes.splash,
+    refreshListenable: refresh,
     redirect: (context, state) {
+      final authState = ref.read(authStateProvider);
+      final appUser = ref.read(appUserProvider);
+      final onboardingSeen = ref.read(onboardingSeenProvider);
+
       final loggingRelated = {
         Routes.login,
         Routes.register,

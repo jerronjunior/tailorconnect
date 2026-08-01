@@ -9,6 +9,7 @@ class PremiumTextField extends StatelessWidget {
   final IconData? prefixIcon;
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
+  final int maxLines;
 
   const PremiumTextField({
     super.key,
@@ -18,6 +19,7 @@ class PremiumTextField extends StatelessWidget {
     this.prefixIcon,
     this.keyboardType = TextInputType.text,
     this.validator,
+    this.maxLines = 1,
   });
 
   @override
@@ -44,9 +46,11 @@ class PremiumTextField extends StatelessWidget {
         obscureText: isPassword,
         keyboardType: keyboardType,
         validator: validator,
+        maxLines: isPassword ? 1 : maxLines,
         style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
           hintText: hintText,
+          alignLabelWithHint: true,
           prefixIcon: prefixIcon != null
               ? Icon(prefixIcon, color: AppColors.goldAccent.withOpacity(0.7), size: 20)
               : null,
