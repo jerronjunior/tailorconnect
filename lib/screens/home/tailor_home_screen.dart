@@ -88,25 +88,13 @@ class _DashboardTab extends ConsumerWidget {
     return ListView(
       padding: const EdgeInsets.all(AppSizes.md),
       children: [
-        Row(
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Good day, $name',
-                      style: theme.textTheme.headlineMedium?.copyWith(color: Colors.white)),
-                  Text('Here’s how your shop is doing',
-                      style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70)),
-                ],
-              ),
-            ),
-            IconButton(
-              tooltip: 'Log out',
-              icon: const Icon(LucideIcons.logOut, color: Colors.white),
-              onPressed: () =>
-                  ref.read(authControllerProvider.notifier).signOut(),
-            ),
+            Text('Good day, $name',
+                style: theme.textTheme.headlineMedium?.copyWith(color: Colors.white)),
+            Text('Here’s how your shop is doing',
+                style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70)),
           ],
         ).animate().fadeIn().moveY(begin: 8),
         const SizedBox(height: AppSizes.lg),

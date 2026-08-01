@@ -293,6 +293,14 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                     const SizedBox(height: AppSizes.xl),
                     LuxuryButton(
                         text: 'Save changes', isLoading: _saving, onPressed: _save),
+                    const SizedBox(height: AppSizes.xl),
+                    const Divider(color: Colors.white12),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: const Icon(LucideIcons.logOut, color: AppColors.error),
+                      title: const Text('Log out', style: TextStyle(color: AppColors.error)),
+                      onTap: _confirmLogout,
+                    ),
                   ],
                 ),
               ),
@@ -301,6 +309,33 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
         );
       },
     );
+  }
+
+  Future<void> _confirmLogout() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: AppColors.darkSurface,
+        title: const Text('Log out?', style: TextStyle(color: Colors.white)),
+        content: const Text(
+          'You’ll need to sign in again to manage your shop.',
+          style: TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('Log out', style: TextStyle(color: AppColors.error)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      await ref.read(authControllerProvider.notifier).signOut();
+    }
   }
 }
 
